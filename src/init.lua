@@ -1,0 +1,1 @@
+requirep 'crash:spaceship_world_generator'
