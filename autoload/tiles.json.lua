@@ -10,11 +10,17 @@ local function tile(args)
     local name = args[2]
     local layer = args.layer or 'lower'
 
+    local pixel_color = '#333'
+    if layer == 'lower' then
+        pixel_color = '#ccc'
+    end
+
     local sprite = f'crash/tg_world/tg_{id}'
     tiles[id]= {
         display_name=name,
         sprite=sprite,
         layer=layer,
+        pixel_color=pixel_color,
     }
     items[id]={
         name=name,
