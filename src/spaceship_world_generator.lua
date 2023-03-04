@@ -91,6 +91,13 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
         map:setUpper(d.x-1, d.y, game.tiles.NIL)
         map:setUpper(d.x+1, d.y, game.tiles.NIL)
     end
+
+    -- Add doors for center room
+    local cdoor_x = offset.x+center_room.x2-3
+    map:set(cdoor_x, offset.y+center_room.y1+1, t_door)
+    map:setUpper(cdoor_x, offset.y+center_room.y1, game.tiles.NIL)
+    map:set(cdoor_x, offset.y+center_room.y2-2, t_door)
+    map:setUpper(cdoor_x, offset.y+center_room.y2-1, game.tiles.NIL)
 end
 
 -- return true if a room was placed
