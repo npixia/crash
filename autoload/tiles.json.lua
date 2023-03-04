@@ -27,10 +27,6 @@ local function tile(args)
         desc=name,
         visual={
             sprite=sprite,
-        },
-        traits={'placeable'},
-        attributes={
-            tile_lower=id,
         }
     }
     if layer == 'upper' then
@@ -54,6 +50,13 @@ for _, tile_name in ipairs(all_tiles) do
             tile{tile_name, 'Wall', layer='upper'}
         end
     end
+end
+
+local required_tiles = {
+    'ice', 'thick_ice', 'gravel', 'grass', 'dirt', 'farmland', 'farmland_wet'
+}
+for _,t in ipairs(required_tiles) do
+    tiles[t] = {layer='lower'}
 end
 
 return {tiles=tiles, items=items}
