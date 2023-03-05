@@ -59,4 +59,24 @@ for _,t in ipairs(required_tiles) do
     tiles[t] = {layer='lower'}
 end
 
+
+--
+-- DOORS
+--
+local function door(closed_id, open_id, name)
+    local closed_door = tile{closed_id, name, layer='upper'}
+    local open_door = tile{open_id, name, layer='upper'}
+
+    open_door.pixel_color = '#ff00ff'
+    closed_door.pixel_color = '#ff00ff'
+
+    open_door.solid = false
+    open_door.wall = false
+    open_door.pixel_color = '#ff00ff'
+    open_door.opacity = 0.0
+    open_door.casts_shadow = false
+end
+
+door('world_door_hatch_h_closed', 'world_door_hatch_h_open', 'Door')
+
 return {tiles=tiles, items=items}
