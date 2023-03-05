@@ -28,6 +28,21 @@ traits['wearable'] = {
     }
 }
 
+traits['light'] = {
+    required={
+        'brightness'
+    },
+    stats={
+        {
+            name='Light',
+            icon='crash/tg_interface/tg_interface_option_alert',
+            key='brightness',
+            show_icon_in_item_name=true,
+            show_value_in_item_name=true,
+        },
+    }
+}
+
 
 
 local function armorSprite(type, color)
@@ -38,18 +53,20 @@ end
 local function makeArmorSet(items, id_base, name, defense, color)
     items[id_base .. '_helmet'] ={
         name= name .. ' Helmet',
-        desc= 'A ' .. name .. ' space suit helmet',
+        desc= 'A ' .. name .. ' space suit helmet. It has a headlamp attached which provides some light',
         visual={
             sprite=armorSprite('helm', color),
             color='white'
         },
-        traits={ 'wearable' },
+        traits={ 'wearable', 'light' },
         attributes={
             wearable='head',
             paperdoll={
-                sprite='paperdoll/helmet1'
+                sprite='paperdoll/helmet1',
+                light={name='white', ['*']=0.8}
             },
-            defense=defense
+            defense=defense,
+            brightness=1,
         }
     }
 
