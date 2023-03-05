@@ -34,6 +34,8 @@ local function tile(args)
         tiles[id].solid = true
         tiles[id].casts_shadow = true
     end
+
+    return tiles[id]
 end
 
 
@@ -78,5 +80,27 @@ local function door(closed_id, open_id, name)
 end
 
 door('world_door_hatch_h_closed', 'world_door_hatch_h_open', 'Door')
+
+--
+-- TERMINAL
+--
+
+local terminals = {
+    a=tile{'world_terminal_a', 'Terminal (Activated)', layer='upper'},
+    b=tile{'world_terminal_b', 'Terminal', layer='upper'},
+    c=tile{'world_terminal_c', 'Terminal (No Power)', layer='upper'},
+}
+for _,terminal in pairs(terminals) do
+    terminal.solid = false
+    terminal.casts_shadow = false
+    terminal.opacity = 0.0
+    terminal.pixel_color = '#00ff00'
+end
+terminals['b'].light = {
+    format='float',
+    r=0.0,
+    g=0.5,
+    b=0.0,
+}
 
 return {tiles=tiles, items=items}
