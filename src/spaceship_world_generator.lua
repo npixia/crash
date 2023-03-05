@@ -12,6 +12,10 @@ local highlight_tile_id = 'world_wall_alien_v_a'
 local wall_interior_tile_id = 'world_wall_lab_v_a'
 
 local Room = requirep 'towngen:room/Room'
+function Room:interior()
+    return Room(self.x1+1, self.y1+1, self.width-2, self.height-2)
+end
+
 local rpu  = requirep 'towngen:room/room_placement_utils'
 
 local ShipRoom = Room:extend()
