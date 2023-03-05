@@ -29,6 +29,22 @@ end
 function ShipRoom:interior()
     return ShipRoom(self.x1+1, self.y1+1, self.width-2, self.height-2)
 end
+function Room:rngPointAlongWall(rng)
+    local x, y
+    if rng:random() < 0.5 then
+        -- Along horizontal walls
+        x = rng:random(1, self.width-2)
+        y = rng:random() < 0.5 and 1 or self.height - 2
+    else
+        -- Along vertical walls
+        y = rng:random(1, self.height-2)
+        x = rng:random() < 0.5 and 1 or self.width - 2
+    end
+
+    return Point(self.x1 + x, self.y1 + y)
+end
+
+
 
 function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn_x, spawn_y, submap_name, params)
 
@@ -84,8 +100,8 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
         r.wall = T(wall_interior_tile_id)
         r:place(map, offset)
     end
-    print('Got ' .. #doors .. ' doors')
-    local t_door = T'world_wall_alien_pool_full'
+    --print('Got ' .. #doors .. ' doors')
+    local t_door = T'world_door_hatch_h_closed'
     for _, door in ipairs(doors) do
         local d = door + offset
         if rng:random() < 0.5 then
@@ -102,6 +118,13 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
     map:setUpper(cdoor_x, offset.y+center_room.y1, game.tiles.NIL)
     map:set(cdoor_x, offset.y+center_room.y2-2, t_door)
     map:setUpper(cdoor_x, offset.y+center_room.y2-1, game.tiles.NIL)
+
+    -- Add terminal to rooms
+    local terminal  = T'world_terminal_b'
+    for _, room in ipairs(rooms) do
+        local p = room:interior():rngPointAlongWall(rng)
+        map:setUpper(offset.x+p.x, offset.y+p.y, terminal)
+    end
 end
 
 -- return true if a room was placed
@@ -126,7 +149,7 @@ function SpaceShip.addSplitRoom(rng, half_ch, rooms, doors)
     local S = Point(rng:random(7,14), rng:random(6,14))
     local min_overlap = -half_ch
     local room_offset = rng:random(min_overlap+1, 10)
-    print(f'min_overlap={min_overlap}, room_offest={room_offset}')
+    --print(f'min_overlap={min_overlap}, room_offest={room_offset}')
     local room_y_1 = half_ch + room_offset
     local room_x, door = SpaceShip.findBackOfShipIntersection(rooms, room_y_1, S.x, S.y, rng)
 
@@ -180,7 +203,7 @@ function SpaceShip.findDoorLocation(rng, room1, room2)
         end
 
     end
-    print('no valid door loc')
+    --print('no valid door loc')
     return nil
 end
 
