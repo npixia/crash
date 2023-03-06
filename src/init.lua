@@ -5,6 +5,12 @@ game.config.setZoom(true)
 -- Called when the world is loaded
 game.signal.subscribe('/world/load/complete', function()
     game.worldgen.use('SpaceShip')
+
+    -- Start on floor -1
+    if not game.world.data().first_load_complete then
+        game.world.teleport(128, 128, 0, 0, -1, '')
+    end
+    game.world.data().first_load_complete = true
 end)
 
 -- Called after the first render tick has completed after the world has loaded

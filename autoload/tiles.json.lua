@@ -61,6 +61,7 @@ for _,t in ipairs(required_tiles) do
     tiles[t] = {layer='lower'}
 end
 
+tiles['world_floor_sand_d'].light = "orange"
 
 --
 -- DOORS
@@ -102,5 +103,26 @@ terminals['b'].light = {
     g=0.5,
     b=0.0,
 }
+
+--
+-- STAIRS
+-- 
+local function stairs(id)
+    local down_stair = tile{id .. '_down', 'Down Stairs', layer='lower'}
+    local up_stair = tile{id .. '_up', 'Up Stairs', layer='upper'}
+
+    up_stair.pixel_color = '#ffff00'
+    down_stair.pixel_color = '#ffff00'
+
+    up_stair.blocks = false
+    up_stair.opacity = 0.0
+    up_stair.solid = false
+
+    up_stair.light = {name='blue', ['*']=0.5}
+    down_stair.light = {name='blue', ['*']=0.5}
+end
+
+stairs('world_wall_rust_stair')
+
 
 return {tiles=tiles, items=items}

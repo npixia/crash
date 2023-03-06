@@ -43,54 +43,66 @@ function Room:rngPointAlongWall(rng)
 
     return Point(self.x1 + x, self.y1 + y)
 end
-
+function Room:isInside(p)
+    return (p.x > self.x1 and
+            p.x < self.x2-1 and
+            p.y > self.y1 and
+            p.y < self.y2-1)
+end
 
 
 function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn_x, spawn_y, submap_name, params)
+    if z == 0 then return end
+    print('Map z: ' .. z)
 
     local rng = game.random.generator(math.random(1,10000))
 
     local cx, cy = width/2, height/2
-    local offset = Point(cx, cy)
 
-    local center_room_width = rng:random(10, 16)
-    local half_ch = rng:random(3, 6)
-    local center_room_height = half_ch * 2 + 1
-    local center_room = ShipRoom(
-        -center_room_width/2,
-        -half_ch,
-        center_room_width,
-        center_room_height)
-    center_room.floor = T(floor_tile_id)
-    center_room.wall = T(wall_tile_id)
+    local prev_floor_stair_loc = nil
+    if z < -1 then
+        prev_floor_stair_loc = game.world.data()['floor_' .. ((-1*z)-1) .. '_down_stair']
+        prev_floor_stair_loc = Point(prev_floor_stair_loc.x, prev_floor_stair_loc.y)
+    end
+    print('Prev floor stairs = ' .. to_str(prev_floor_stair_loc))
 
-
-    -- Place a room directly above and below
-    local S = Point(rng:random(7,14), rng:random(5,14))
-    local room_2_a = ShipRoom(0, half_ch-1, S.x, S.y)
-    local room_2_b = ShipRoom(0, -(half_ch+S.y-2), S.x, S.y)
-
-
-    local rooms = {room_2_a, room_2_b, center_room}
-    local doors = {}
-
-    local num_room_levels = rng:random(7,10)
-    local levels_placed = 0
-    for _=0,100 do
-        local placed_room = false
-        if rng:random() < 0.5 then
-            placed_room = self.addSplitRoom(rng, half_ch, rooms, doors)
+    -- Generate ship layout
+    local rooms, doors, center_room, stair_loc
+    local can_place_prev_floor_stairs = false
+    
+    for layout_attempt_number = 1,100 do
+        rooms, doors, center_room, stair_loc = SpaceShip.generateLayout(rng, width, height)
+        -- Make sure the down stairs can be placed in a room
+        -- And make sure the down stairs are not the same as the up stairs
+        if prev_floor_stair_loc == nil then
+            can_place_prev_floor_stairs = true
         else
-            placed_room = self.addCenterRoom(rng, rooms, doors)
-        end
-
-        if placed_room then
-            levels_placed = levels_placed + 1
-            if levels_placed >= num_room_levels then
-                break
+            for _, room in ipairs(rooms) do
+                if room:interior():isInside(prev_floor_stair_loc) then
+                    can_place_prev_floor_stairs = true
+                    break
+                end
+            end
+            if prev_floor_stair_loc.x == stair_loc.x and prev_floor_stair_loc.y == prev_floor_stair_loc.y then
+                can_place_prev_floor_stairs = false
             end
         end
+
+        if can_place_prev_floor_stairs then
+            print('Found good layout on attempt #' .. layout_attempt_number)
+            break
+        end
     end
+
+    if not can_place_prev_floor_stairs then
+        print("Can't place previous floor stairs :(")
+    end
+
+    --
+    -- Place Tiles
+    --
+
+    local offset = Point(cx, cy)
 
     for _, room in ipairs(rooms) do
         room:place(map, offset)
@@ -125,6 +137,83 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
         local p = room:interior():rngPointAlongWall(rng)
         map:setUpper(offset.x+p.x, offset.y+p.y, terminal)
     end
+
+    -- Add staircase
+    map:setLower(offset.x+stair_loc.x, offset.y+stair_loc.y, T'world_wall_rust_stair_down')
+    map:setUpper(offset.x+stair_loc.x, offset.y+stair_loc.y, game.tiles.NIL)
+
+    if prev_floor_stair_loc then
+        local p = prev_floor_stair_loc
+        map:setUpper(offset.x+p.x, offset.y+p.y, T'world_wall_rust_stair_up')
+    end
+
+    game.world.data()['floor_' .. (-1*z) .. '_down_stair'] = {x=stair_loc.x, y=stair_loc.y}
+end
+
+-- Return list of rooms, list of doors, and down staircase location
+function SpaceShip.generateLayout(rng, width, height)
+    local cx, cy = width/2, height/2
+    local center_room_width = rng:random(10, 16)
+    local half_ch = rng:random(3, 6)
+    local center_room_height = half_ch * 2 + 1
+    local center_room = ShipRoom(
+        -center_room_width/2,
+        -half_ch,
+        center_room_width,
+        center_room_height)
+    center_room.floor = T(floor_tile_id)
+    center_room.wall = T(wall_tile_id)
+
+
+    -- Place a room directly above and below
+    local S = Point(rng:random(7,14), rng:random(5,14))
+    local room_2_a = ShipRoom(0, half_ch-1, S.x, S.y)
+    local room_2_b = ShipRoom(0, -(half_ch+S.y-2), S.x, S.y)
+
+
+    local rooms = {room_2_a, room_2_b, center_room}
+    local doors = {}
+
+    local num_room_levels = rng:random(7,10)
+    local levels_placed = 0
+    for _=0,100 do
+        local placed_room = false
+        if rng:random() < 0.5 then
+            placed_room = SpaceShip.addSplitRoom(rng, half_ch, rooms, doors)
+        else
+            placed_room = SpaceShip.addCenterRoom(rng, rooms, doors)
+        end
+
+        if placed_room then
+            levels_placed = levels_placed + 1
+            if levels_placed >= num_room_levels then
+                break
+            end
+        end
+    end
+
+    -- Add stairs
+    -- Stairs must be somewhat near the center of the ship
+    -- Floors below are randomly generated until they have a valid
+    -- configuration the the stairs will fit into
+    -- Keeping them near the center increases the chances
+    local stair_attempts = 10
+    local stair_loc = Point(0,0)
+    for _=1,stair_attempts do
+        local room = rooms[rng:random(1,#rooms)]:interior()
+        local point = Point(rng:random(room.x1+1, room.x2-2),
+                            rng:random(room.y1+1, room.y2-2))
+        if point.x > 10 and point.x < 40 and point.y > -15 and point.y < 15 then
+            print('Found stair loc' .. to_str(point))
+            stair_loc = point
+            break
+        else
+            print('Not good stair loc' .. to_str(point))
+        end
+    end
+
+    return rooms, doors, center_room, stair_loc
+
 end
 
 -- return true if a room was placed
