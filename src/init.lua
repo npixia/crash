@@ -1,6 +1,8 @@
 requirep 'crash:spaceship_world_generator'
 
+-- Config
 game.config.setZoom(true)
+game.config.setAutomoveWaitTime(120)
 
 -- Called when the world is loaded
 game.signal.subscribe('/world/load/complete', function()
