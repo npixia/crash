@@ -126,4 +126,12 @@ end
 stairs('world_wall_rust_stair')
 
 
+--
+-- BLOOD
+--
+
+local blood = {
+    tile{'world_blood_red_c', 'Blood', layer='upper', solid=false}
+}
+
 return {tiles=tiles, items=items}

@@ -43,6 +43,13 @@ function Room:rngPointAlongWall(rng)
 
     return Point(self.x1 + x, self.y1 + y)
 end
+function Room:rngPointInterior(rng, margin)
+    margin = margin or 0
+    return Point(
+        self.x1 + margin + rng:random(1, self.width-(2*(1+margin))),
+        self.y1 + margin + rng:random(1, self.height-(2*(1+margin)))
+    )
+end
 function Room:isInside(p)
     return (p.x > self.x1 and
             p.x < self.x2-1 and
@@ -64,7 +71,7 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
         prev_floor_stair_loc = game.world.data()['floor_' .. ((-1*z)-1) .. '_down_stair']
         prev_floor_stair_loc = Point(prev_floor_stair_loc.x, prev_floor_stair_loc.y)
     end
-    print('Prev floor stairs = ' .. to_str(prev_floor_stair_loc))
+    --print('Prev floor stairs = ' .. to_str(prev_floor_stair_loc))
 
     -- Generate ship layout
     local rooms, doors, center_room, stair_loc
@@ -148,6 +155,28 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
     end
 
     game.world.data()['floor_' .. (-1*z) .. '_down_stair'] = {x=stair_loc.x, y=stair_loc.y}
+
+
+    -- Place engineers
+    local num_engineers_to_place = rng:random(2,3)
+    while num_engineers_to_place > 0 do
+        local room = rooms[rng:random(1, #rooms)]
+        local p = offset + room:rngPointInterior(rng, 1)
+        if map:getUpper(p.x, p.y) == game.tiles.NIL and p:dist(offset + stair_loc) > 10 then
+            local engineer_id = map:spawn('engineer', p.x, p.y)
+            local engineer = map:actors():getActor(engineer_id)
+            local keycard = game.items.makeItem('keycard')
+            local next_floor = -1*z + 1
+            keycard.attr.floor = next_floor
+            keycard.attr.floor_name = '[[Floor ' .. next_floor .. ']]'
+            print('Giving keycard with attr ' .. to_str(keycard.attr))
+            engineer:give(keycard)
+            map:setUpper(p.x, p.y, T'world_blood_red_c')
+            num_engineers_to_place = num_engineers_to_place - 1
+            print('Placed engineer @ ' .. to_str(p))
+        end
+    end
+
 end
 
 -- Return list of rooms, list of doors, and down staircase location
@@ -204,11 +233,11 @@ function SpaceShip.generateLayout(rng, width, height)
         local point = Point(rng:random(room.x1+1, room.x2-2),
                             rng:random(room.y1+1, room.y2-2))
         if point.x > 10 and point.x < 40 and point.y > -15 and point.y < 15 then
-            print('Found stair loc' .. to_str(point))
+            --print('Found stair loc' .. to_str(point))
             stair_loc = point
             break
         else
-            print('Not good stair loc' .. to_str(point))
+            --print('Not good stair loc' .. to_str(point))
         end
     end
 
