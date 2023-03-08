@@ -139,7 +139,7 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
     end
 
     -- Add staircase
-    map:setLower(offset.x+stair_loc.x, offset.y+stair_loc.y, T'world_wall_rust_stair_down')
+    map:setLower(offset.x+stair_loc.x, offset.y+stair_loc.y, T'world_wall_rust_stair_down_locked')
     map:setUpper(offset.x+stair_loc.x, offset.y+stair_loc.y, game.tiles.NIL)
 
     if prev_floor_stair_loc then

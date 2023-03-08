@@ -9,6 +9,8 @@ local function tile(args)
     local id = args[1]
     local name = args[2]
     local layer = args.layer or 'lower'
+    local upper_solid = true
+    if args.solid == false then upper_solid = false end
 
     local pixel_color = '#333'
     if layer == 'lower' then
@@ -29,7 +31,7 @@ local function tile(args)
             sprite=sprite,
         }
     }
-    if layer == 'upper' then
+    if layer == 'upper' and upper_solid then
         tiles[id].opacity = 1.0
         tiles[id].solid = true
         tiles[id].casts_shadow = true
@@ -87,14 +89,11 @@ door('world_door_hatch_h_closed', 'world_door_hatch_h_open', 'Door')
 --
 
 local terminals = {
-    a=tile{'world_terminal_a', 'Terminal (Activated)', layer='upper'},
-    b=tile{'world_terminal_b', 'Terminal', layer='upper'},
-    c=tile{'world_terminal_c', 'Terminal (No Power)', layer='upper'},
+    a=tile{'world_terminal_a', 'Terminal (Activated)', layer='upper', solid=false},
+    b=tile{'world_terminal_b', 'Terminal', layer='upper', solid=false},
+    c=tile{'world_terminal_c', 'Terminal (No Power)', layer='upper', solid=false},
 }
 for _,terminal in pairs(terminals) do
-    terminal.solid = false
-    terminal.casts_shadow = false
-    terminal.opacity = 0.0
     terminal.pixel_color = '#00ff00'
 end
 terminals['b'].light = {
@@ -109,17 +108,19 @@ terminals['b'].light = {
 -- 
 local function stairs(id)
     local down_stair = tile{id .. '_down', 'Down Stairs', layer='lower'}
-    local up_stair = tile{id .. '_up', 'Up Stairs', layer='upper'}
+    local up_stair = tile{id .. '_up', 'Up Stairs', layer='upper', solid=false}
+    local down_stair_locked = tile{id .. '_down_locked', 'Down Stairs (Locked)', layer='lower'}
 
     up_stair.pixel_color = '#ffff00'
     down_stair.pixel_color = '#ffff00'
+    down_stair_locked.pixel_color = '#ffff00'
 
-    up_stair.blocks = false
-    up_stair.opacity = 0.0
-    up_stair.solid = false
+    down_stair_locked.sprite = f'crash/tg_world/tg_' .. id .. '_down'
 
+    -- For debugging
     up_stair.light = {name='blue', ['*']=0.5}
     down_stair.light = {name='blue', ['*']=0.5}
+    down_stair_locked.light = {name='blue', ['*']=0.5}
 end
 
 stairs('world_wall_rust_stair')

@@ -24,6 +24,9 @@ local function addStairInteraction(id)
         end
     end)
 
+    game.tiles.addInteraction(id .. '_down_locked', 'descend', function(actor, x, y)
+        print("[color=red]ACCESS DENIED[/color] Please insert keycard for this floor")
+    end)
 end
 
 addStairInteraction('world_wall_rust_stair')
