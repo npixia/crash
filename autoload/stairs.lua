@@ -1,3 +1,5 @@
+local ship_power = requirep 'crash:ship_power'
+
 local function addStairInteraction(id)
 
     game.tiles.addInteraction(id .. '_up', 'ascend', function(actor, x, y)
@@ -7,6 +9,11 @@ local function addStairInteraction(id)
                 print("Can't go up!")
             else
                 game.world.teleport(x, y, map_x, map_y, map_z+1, region)
+                print('Checking ship power status...')
+                if ship_power.isPowerOn() then
+                    print('power status is on, turning on the lights..')
+                    ship_power.activateFloor(game.world.map())
+                end
             end
         else
             print('Must be standing on stairs');

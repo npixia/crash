@@ -185,11 +185,10 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
     end
 
     -- Add lights to rooms
+    local light_locations = {}
     local lights = {}
-    local bright_lights = {}
     for _, dir in ipairs({'N','S','E','W'}) do
-        lights[dir] = T('world_wall_light_blue_' .. dir)
-        bright_lights[dir] = T('world_wall_light_blue_bright_' .. dir)
+        lights[dir] = T('world_wall_light_blue_' .. dir .. '_bright')
     end
     for _, room in ipairs(rooms) do
         local light_placed = false
@@ -201,7 +200,8 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
                 local dir = fromDir(dir_id)
                 local wall_check_loc = p + dir
                 if map:getUpper(wall_check_loc.x, wall_check_loc.y).is_solid then
-                    map:setUpper(p.x, p.y, bright_lights[dir_id])
+                    map:setUpper(p.x, p.y, lights[dir_id])
+                    table.insert(light_locations, {x=p.x, y=p.y})
                     light_placed = true
                 else
                     print(to_str(map:getUpper(wall_check_loc.x, wall_check_loc.y)) .. ' is not solid')
@@ -217,6 +217,8 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
             print('Placed light')
         end
     end
+    -- Store light locations
+    map:attr().light_locations = light_locations
 
     -- Add staircase
     if not last_floor then
