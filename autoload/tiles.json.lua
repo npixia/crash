@@ -179,4 +179,15 @@ for _, dir in ipairs(dirs) do
     table.insert(wall_lights, light)
 end
 
+--
+-- CHESTS
+--
+
+local chest = tile{'world_chest_closed', 'Storage', layer='upper', solid=false}
+chest.actor = {
+    inventory={size_limit=10},
+    blocks=false,
+}
+
+
 return {tiles=tiles, items=items}

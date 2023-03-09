@@ -6,3 +6,8 @@ game.items.defineAction('oxygen_pack', 'use', {},
         return {remove_item=true, time=100}
     end
 )
+
+game.items.defineEvent('oxygen_pack', 'onGenerateRandom', function(item, rng)
+    item.attr.oxygen_amount=rng:random(20,42)
+end)
+

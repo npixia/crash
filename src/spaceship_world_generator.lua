@@ -4,6 +4,7 @@ game.worldgen.register(SpaceShip, 'crash', 'src/spaceship_world_generator.lua')
 
 local Point = game.objects.Vector2d
 local maputils = requirep 'crash:maputils'
+local loot = requirep 'crash:loot'
 
 local T = game.tiles.fromID
 local floor_tile_id = 'world_floor_quad_checker_a'
@@ -219,6 +220,16 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
     end
     -- Store light locations
     map:attr().light_locations = light_locations
+
+    -- Chests
+    for _, room in ipairs(rooms) do
+        local p = offset + room:interior():rngPointAlongWall(rng)
+        if map:getUpper(p.x, p.y) == game.tiles.NIL then
+            local chest_id = map:spawn('chest', p.x, p.y)
+            local chest = map:actors():getActor(chest_id)
+            loot.fillChest(rng, chest, z)
+        end
+    end
 
     -- Add staircase
     if not last_floor then
