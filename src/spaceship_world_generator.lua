@@ -271,11 +271,12 @@ end
 -- Return list of rooms, list of doors, and down staircase location
 function SpaceShip.generateLayout(rng, width, height)
     local cx, cy = width/2, height/2
-    local center_room_width = rng:random(10, 16)
+    local half_cw = rng:random(5, 8)
     local half_ch = rng:random(3, 6)
+    local center_room_width  = half_cw * 2 + 1
     local center_room_height = half_ch * 2 + 1
     local center_room = ShipRoom(
-        -center_room_width/2,
+        -half_cw,
         -half_ch,
         center_room_width,
         center_room_height)
@@ -284,7 +285,7 @@ function SpaceShip.generateLayout(rng, width, height)
 
 
     -- Place a room directly above and below
-    local S = Point(rng:random(7,14), rng:random(5,14))
+    local S = Point(rng:random(9,14), rng:random(5,14))
     local room_2_a = ShipRoom(0, half_ch-1, S.x, S.y)
     local room_2_b = ShipRoom(0, -(half_ch+S.y-2), S.x, S.y)
 
@@ -381,7 +382,6 @@ function SpaceShip.findBackOfShipIntersection(rooms, room_y, room_width, room_he
         local room_x = start_x - i
         local room = ShipRoom(room_x, room_y+1, room_width, room_height-1)
         for _, r in ipairs(rooms) do
-            -- TODO: Need to check that interior intersect
             local roomi, ri = room:interior(), r:interior()
             if roomi:intersects(ri) then
                 local door = SpaceShip.findDoorLocation(rng, roomi, ri)
