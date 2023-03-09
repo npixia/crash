@@ -24,4 +24,14 @@ function maputils.rect(map, x, y, w, h, tile)
 
 end
 
+function maputils.hasLOS(map, from, to)
+    local points = game.util.traceLine(from.x, from.y, to.x, to.y)
+    for i,p in ipairs(points) do
+        if map:getUpper(p[1], p[2]).is_solid then
+            return false 
+        end
+    end
+    return true
+end
+
 return maputils

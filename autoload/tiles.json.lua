@@ -12,6 +12,10 @@ local function tile(args)
     local upper_solid = true
     if args.solid == false then upper_solid = false end
     local sprite_base = args.sprite or id
+    local hardness = 1
+    if layer == 'lower' or args.unbreakable then
+        hardness = 999
+    end
 
     local pixel_color = '#333'
     if layer == 'lower' then
@@ -25,7 +29,7 @@ local function tile(args)
         layer=layer,
         pixel_color=pixel_color,
         -- Can only be broken by explosives
-        tool={ type='explosive', hardness=0, hp=1},
+        tool={ type='explosive', hardness=hardness, hp=1},
     }
     items[id]={
         name=name,
@@ -68,6 +72,9 @@ end
 
 tiles['world_floor_sand_d'].light = "orange"
 
+-- EXTERIOR WALL
+
+tile{'exterior_wall', 'Ship Wall', sprite='world_wall_derelict_v_a', layer='upper', unbreakable=true}
 --
 -- DOORS
 --
@@ -110,9 +117,9 @@ terminals['b'].light = {
 -- STAIRS
 -- 
 local function stairs(id)
-    local down_stair = tile{id .. '_down', 'Down Stairs', layer='lower'}
-    local up_stair = tile{id .. '_up', 'Up Stairs', layer='upper', solid=false}
-    local down_stair_locked = tile{id .. '_down_locked', 'Down Stairs (Locked)', layer='lower'}
+    local down_stair = tile{id .. '_down', 'Down Stairs', layer='lower', unbreakable=true}
+    local up_stair = tile{id .. '_up', 'Up Stairs', layer='upper', solid=false, unbreakable=true}
+    local down_stair_locked = tile{id .. '_down_locked', 'Down Stairs (Locked)', layer='lower', unbreakable=true}
 
     up_stair.pixel_color = '#ffff00'
     down_stair.pixel_color = '#ffff00'
@@ -141,8 +148,8 @@ local blood = {
 -- GENERATOR
 --
 
-local generator_on =  tile{'world_generator_on', 'Generator', layer='upper', solid=false}
-local generator_off = tile{'world_generator_off', 'Generator', layer='upper', solid=false}
+local generator_on =  tile{'world_generator_on', 'Generator Control', layer='upper', solid=false, unbreakable=true}
+local generator_off = tile{'world_generator_off', 'Generator Control', layer='upper', solid=false, unbreakable=true}
 
 generator_off.light = {format='float', r=0.3}
 generator_on.light  = {format='float', g=0.5}
@@ -161,14 +168,14 @@ for _, dir in ipairs(dirs) do
         solid=false
     }
     local bright_light = tile{
-        'world_wall_light_blue_bright_' .. dir,
+        'world_wall_light_blue_' .. dir .. '_bright',
         'Wall Light',
         layer='upper',
         solid=false,
         sprite='world_wall_light_blue_' .. dir,
     }
-    --light.light = {format='float', b=0.4, r=0.3, g=0.3}
-    --bright_light.light = {format='float', b=0.8, r=0.7, g=0.7}
+    light.light = {format='float', b=0.4, r=0.3, g=0.3}
+    bright_light.light = {format='float', b=0.8, r=0.7, g=0.7}
     table.insert(wall_lights, light)
 end
 

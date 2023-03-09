@@ -7,7 +7,7 @@ local maputils = requirep 'crash:maputils'
 
 local T = game.tiles.fromID
 local floor_tile_id = 'world_floor_quad_checker_a'
-local wall_tile_id = 'world_wall_derelict_v_a'
+local wall_tile_id = 'exterior_wall'
 local highlight_tile_id = 'world_wall_alien_v_a'
 local wall_interior_tile_id = 'world_wall_lab_v_a'
 
