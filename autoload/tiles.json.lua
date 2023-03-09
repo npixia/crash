@@ -11,18 +11,21 @@ local function tile(args)
     local layer = args.layer or 'lower'
     local upper_solid = true
     if args.solid == false then upper_solid = false end
+    local sprite_base = args.sprite or id
 
     local pixel_color = '#333'
     if layer == 'lower' then
         pixel_color = '#ccc'
     end
 
-    local sprite = f'crash/tg_world/tg_{id}'
+    local sprite = f'crash/tg_world/tg_{sprite_base}'
     tiles[id]= {
         display_name=name,
         sprite=sprite,
         layer=layer,
         pixel_color=pixel_color,
+        -- Can only be broken by explosives
+        tool={ type='explosive', hardness=0, hp=1},
     }
     items[id]={
         name=name,
@@ -99,7 +102,7 @@ end
 terminals['b'].light = {
     format='float',
     r=0.0,
-    g=0.5,
+    g=0.2,
     b=0.0,
 }
 
@@ -133,5 +136,40 @@ stairs('world_wall_rust_stair')
 local blood = {
     tile{'world_blood_red_c', 'Blood', layer='upper', solid=false}
 }
+
+--
+-- GENERATOR
+--
+
+local generator_on =  tile{'world_generator_on', 'Generator', layer='upper', solid=false}
+local generator_off = tile{'world_generator_off', 'Generator', layer='upper', solid=false}
+
+generator_off.light = {format='float', r=0.3}
+generator_on.light  = {format='float', g=0.5}
+
+--
+-- Lights
+--
+
+local dirs = {'N', 'S', 'W', 'E'}
+local wall_lights = {}
+for _, dir in ipairs(dirs) do
+    local light = tile{
+        'world_wall_light_blue_' .. dir,
+        'Wall Light',
+        layer='upper',
+        solid=false
+    }
+    local bright_light = tile{
+        'world_wall_light_blue_bright_' .. dir,
+        'Wall Light',
+        layer='upper',
+        solid=false,
+        sprite='world_wall_light_blue_' .. dir,
+    }
+    --light.light = {format='float', b=0.4, r=0.3, g=0.3}
+    --bright_light.light = {format='float', b=0.8, r=0.7, g=0.7}
+    table.insert(wall_lights, light)
+end
 
 return {tiles=tiles, items=items}

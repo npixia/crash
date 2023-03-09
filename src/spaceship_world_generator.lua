@@ -18,6 +18,10 @@ end
 
 local rpu  = requirep 'towngen:room/room_placement_utils'
 
+local function isLastFloor(z)
+    return -1 * z == 4
+end
+
 local ShipRoom = Room:extend()
 function ShipRoom:place(map, offset)
     local wall = self.wall or T(wall_tile_id)
@@ -57,10 +61,45 @@ function Room:isInside(p)
             p.y < self.y2-1)
 end
 
+-- Convert relative cardinal direction to N/S/E/W id
+local function toDir(p)
+    if p.x < 0 then
+        return 'W'
+    elseif p.x > 0 then
+        return 'E'
+    elseif p.y < 0 then
+        return 'N'
+    elseif p.y > 0 then
+        return 'S'
+    else
+        return ''
+    end
+end
+
+local function fromDir(dir)
+    if dir == 'N' then
+        return Point(0, -1)
+    elseif dir == 'S' then
+        return Point(0, 1)
+    elseif dir == 'W' then
+        return Point(-1, 0)
+    elseif dir == 'E' then
+        return Point(1, 0)
+    end
+end
+
+local function randchoice(rng, list)
+    return list[rng:random(1,#list)]
+end
+
 
 function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn_x, spawn_y, submap_name, params)
     if z == 0 then return end
     print('Map z: ' .. z)
+    local last_floor = isLastFloor(z)
+    if isLastFloor(z) then
+        print('Final floor!')
+    end
 
     local rng = game.random.generator(math.random(1,10000))
 
@@ -145,9 +184,45 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
         map:setUpper(offset.x+p.x, offset.y+p.y, terminal)
     end
 
+    -- Add lights to rooms
+    local lights = {}
+    local bright_lights = {}
+    for _, dir in ipairs({'N','S','E','W'}) do
+        lights[dir] = T('world_wall_light_blue_' .. dir)
+        bright_lights[dir] = T('world_wall_light_blue_bright_' .. dir)
+    end
+    for _, room in ipairs(rooms) do
+        local light_placed = false
+        local attempts = 0
+        repeat
+            local p = offset + room:interior():rngPointAlongWall(rng)
+            if map:getUpper(p.x, p.y) == game.tiles.NIL then
+                local dir_id = randchoice(rng, {'N', 'S', 'E', 'W'})
+                local dir = fromDir(dir_id)
+                local wall_check_loc = p + dir
+                if map:getUpper(wall_check_loc.x, wall_check_loc.y).is_solid then
+                    map:setUpper(p.x, p.y, bright_lights[dir_id])
+                    light_placed = true
+                else
+                    print(to_str(map:getUpper(wall_check_loc.x, wall_check_loc.y)) .. ' is not solid')
+                end
+            else
+                print('Point along wall is not nil')
+            end
+            attempts = attempts + 1
+        until light_placed or attempts > 100
+        if not light_placed then
+            print('Failed to place light')
+        else
+            print('Placed light')
+        end
+    end
+
     -- Add staircase
-    map:setLower(offset.x+stair_loc.x, offset.y+stair_loc.y, T'world_wall_rust_stair_down_locked')
-    map:setUpper(offset.x+stair_loc.x, offset.y+stair_loc.y, game.tiles.NIL)
+    if not last_floor then
+        map:setLower(offset.x+stair_loc.x, offset.y+stair_loc.y, T'world_wall_rust_stair_down_locked')
+        map:setUpper(offset.x+stair_loc.x, offset.y+stair_loc.y, game.tiles.NIL)
+    end
 
     if prev_floor_stair_loc then
         local p = prev_floor_stair_loc
@@ -165,16 +240,30 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
         if map:getUpper(p.x, p.y) == game.tiles.NIL and p:dist(offset + stair_loc) > 10 then
             local engineer_id = map:spawn('engineer', p.x, p.y)
             local engineer = map:actors():getActor(engineer_id)
-            local keycard = game.items.makeItem('keycard')
-            local next_floor = -1*z + 1
-            keycard.attr.floor = next_floor
-            keycard.attr.floor_name = '[[Floor ' .. next_floor .. ']]'
-            print('Giving keycard with attr ' .. to_str(keycard.attr))
-            engineer:give(keycard)
+            -- If we are not on the last floor, give them the key card to the next floor
+            if not last_floor then
+                local keycard = game.items.makeItem('keycard')
+                local next_floor = -1*z + 1
+                keycard.attr.floor = next_floor
+                keycard.attr.floor_name = '[[Floor ' .. next_floor .. ']]'
+                print('Giving keycard with attr ' .. to_str(keycard.attr))
+                engineer:give(keycard)
+            end
             map:setUpper(p.x, p.y, T'world_blood_red_c')
             num_engineers_to_place = num_engineers_to_place - 1
             print('Placed engineer @ ' .. to_str(p))
         end
+    end
+
+    -- Special last floor placement
+    if last_floor then
+        local generator_loc = Point(0,0)
+        repeat
+            generator_loc = offset + center_room:interior():rngPointInterior(rng)
+        until map:getUpper(generator_loc.x, generator_loc.y) == game.tiles.NIL
+
+        map:setUpper(generator_loc.x, generator_loc.y, T'world_generator_off')
+        print('Placed generator @ ' .. to_str(generator_loc))
     end
 
 end
