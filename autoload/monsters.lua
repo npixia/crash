@@ -29,9 +29,19 @@ local function moveTowardPlayer(actor, map)
             local _, next_pos = pathfinding.pathfind(current_pos, player_pos, {draw=true, maxiters=20})
             if next_pos then
                 actor:setXY(next_pos.x, next_pos.y)
+                actor:actor().last_move_time = clock()
             end
         end
     end
+
+    if actor:attr().last_move_time > 200 then
+        if math.random() < 0.2 then
+            local next_pos = Point(math.random(-1, 1), math.random(-1, 1)) + current_pos
+            actor:setXY(next_pos.x, next_pos.y)
+        end
+    end
+
+
 end
 
 local function rangedAttack(actor, rate, projectile)
