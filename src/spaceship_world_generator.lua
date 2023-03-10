@@ -6,13 +6,12 @@ local Point = game.objects.Vector2d
 local maputils = requirep 'crash:maputils'
 local rngutils = requirep 'crash:rngutils'
 local mob_spawning = requirep 'crash:mob_spawning'
+local tile_info = requirep 'crash:tile_info'
 local loot = requirep 'crash:loot'
 
 local T = game.tiles.fromID
 local floor_tile_id = 'world_floor_quad_checker_a'
 local wall_tile_id = 'exterior_wall'
-local highlight_tile_id = 'world_wall_alien_v_a'
-local wall_interior_tile_id = 'world_wall_lab_v_a'
 
 local Room = requirep 'towngen:room/Room'
 function Room:interior()
@@ -26,15 +25,48 @@ local function isLastFloor(z)
 end
 
 local ShipRoom = Room:extend()
-function ShipRoom:place(map, offset)
-    local wall = self.wall or T(wall_tile_id)
-    local floor = self.floor or T(floor_tile_id)
-    rpu.fillRect(map, self.x1+offset.x, self.y1+offset.y, self.width, self.height, floor) 
-    rpu.rect(map, self.x1+offset.x, self.y1+offset.y, self.width, self.height, wall)
-    map:set(self.x1+offset.x, self.y1+offset.y, T(highlight_tile_id))
+function ShipRoom:place(map, offset, rng)
+    if self.floor_variants then
+        maputils.fillRectVariants(
+            map,
+            self.x1+offset.x, self.y1+offset.y,
+            self.width, self.height,
+            self.floor, self.floor_variants,
+            0.2, rng) 
+    else
+        maputils.fillRect(
+            map,
+            self.x1+offset.x, self.y1+offset.y,
+            self.width, self.height,
+            self.floor) 
+    end
+
+    if self.wall_variants then
+        maputils.rectVariants(
+            map,
+            self.x1+offset.x, self.y1+offset.y,
+            self.width, self.height,
+            self.wall, self.wall_variants,
+            0.2, rng)
+    else
+        maputils.rect(map,
+            self.x1+offset.x, self.y1+offset.y,
+            self.width, self.height,
+            self.wall)
+    end
+
 end
 function ShipRoom:interior()
-    return ShipRoom(self.x1+1, self.y1+1, self.width-2, self.height-2)
+    local r = ShipRoom(self.x1+1, self.y1+1, self.width-2, self.height-2)
+    r.wall = self.wall
+    r.floor = self.floor
+    return r
+end
+function ShipRoom:copy()
+    local r = ShipRoom(self.x1, self.y1, self.width, self.height)
+    r.wall = self.wall
+    r.floor = self.floor
+    return r
 end
 function Room:rngPointAlongWall(rng)
     local x, y
@@ -150,12 +182,27 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
     local offset = Point(cx, cy)
 
     for _, room in ipairs(rooms) do
+        room = room:copy()
+        room.wall = T'exterior_wall'
+        room.floor = T(floor_tile_id)
         room:place(map, offset)
     end
     for _, room in ipairs(rooms) do
         local r = room:interior()
-        r.wall = T(wall_interior_tile_id)
-        r:place(map, offset)
+
+        if r.wall == nil then
+            local wall_type = rngutils.randchoice(rng, tile_info.wall_types)
+            r.wall = T('world_' .. wall_type.base)
+            r.wall_variants = list.map(wall_type.variants, function(id) return T('world_' .. id) end)
+        end
+
+        if r.floor == nil then
+            local floor_type = rngutils.randchoice(rng, tile_info.floor_types)
+            r.floor = T('world_' .. floor_type.base)
+            r.floor_variants = list.map(floor_type.variants, function(id) return T('world_' .. id) end)
+        end
+
+        r:place(map, offset, rng)
     end
     --print('Got ' .. #doors .. ' doors')
     local t_door = T'world_door_hatch_h_closed'
@@ -289,7 +336,6 @@ function SpaceShip.generateLayout(rng, width, height)
         center_room_height)
     center_room.floor = T(floor_tile_id)
     center_room.wall = T(wall_tile_id)
-
 
     -- Place a room directly above and below
     local S = Point(rng:random(9,14), rng:random(5,14))

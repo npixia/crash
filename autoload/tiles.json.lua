@@ -74,7 +74,7 @@ tiles['world_floor_sand_d'].light = "orange"
 
 -- EXTERIOR WALL
 
-tile{'exterior_wall', 'Ship Wall', sprite='world_wall_derelict_v_a', layer='upper', unbreakable=true}
+tile{'exterior_wall', 'Ship Wall', sprite='world_blank', layer='upper', unbreakable=true}
 --
 -- DOORS
 --
