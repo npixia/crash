@@ -33,17 +33,53 @@ local function moveTowardPlayer(actor, map)
     end
 end
 
-game.actors.addCallback('alien', 'onSpawn', function(actor, map)
-    init(actor)
-end)
-
-game.actors.addCallback('alien', 'update', function(actor, map)
-    moveTowardPlayer(actor, map)
-
+local function rangedAttack(actor, rate, projectile)
     local player_pos = player():pos()
-    if clock() - actor:attr().last_fire_time > 500 then
-        game.items.fire(game.items.makeItem('energy_projectile'), actor:getX(), actor:getY(), player_pos.x, player_pos.y)
+    if clock() - actor:attr().last_fire_time > rate then
+        game.items.fire(projectile, actor:getX(), actor:getY(), player_pos.x, player_pos.y)
         actor:attr().last_fire_time = clock()
     end
+end
 
+local function putBlood(map, p) -- p: Point
+    if map:getUpper(p.x, p.y) == game.tiles.NIL then
+        map:setUpper(p.x, p.y, game.tiles.fromID('world_blood_alien_' .. list.randchoice({'a','b','c','d'})))
+    end
+end
+local function death(actor, map)
+    local p = actor:pos()
+    putBlood(map, p)
+    putBlood(map, p + Point(math.random(-1,1), math.random(-1,1)))
+end
+
+local alien_ids = {
+    'alien',
+    'soldier',
+    'alien_saber',
+    'crawler',
+    'big_crawler',
+    'leader'
+}
+for _, actor_id in ipairs(alien_ids) do
+    game.actors.addCallback(actor_id, 'onSpawn', function(actor, map) init(actor) end)
+    game.actors.addCallback(actor_id, 'onDeath', function(actor, map) death(actor, map) end)
+end
+
+-- Standard hostiles
+
+game.actors.addCallback('alien',       'update', function(actor, map) moveTowardPlayer(actor, map) end)
+game.actors.addCallback('crawler',     'update', function(actor, map) moveTowardPlayer(actor, map) end)
+game.actors.addCallback('alien_saber', 'update', function(actor, map) moveTowardPlayer(actor, map) end)
+game.actors.addCallback('big_crawler', 'update', function(actor, map) moveTowardPlayer(actor, map) end)
+
+-- Ranged Hostiles
+
+game.actors.addCallback('soldier', 'update', function(actor, map)
+    moveTowardPlayer(actor, map)
+    rangedAttack(actor, 500, game.items.makeItem('energy_projectile'))
+end)
+
+game.actors.addCallback('leader', 'update', function(actor, map)
+    moveTowardPlayer(actor, map)
+    rangedAttack(actor, 500, game.items.makeItem('energy_projectile'))
 end)

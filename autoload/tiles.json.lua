@@ -140,9 +140,10 @@ stairs('world_wall_rust_stair')
 -- BLOOD
 --
 
-local blood = {
-    tile{'world_blood_red_c', 'Blood', layer='upper', solid=false}
-}
+for _, x in ipairs({'a','b','c','d'}) do
+    tile{'world_blood_alien_' .. x, 'Alien Blood', layer='upper', solid=false}
+    tile{'world_blood_red_' .. x, 'Blood', layer='upper', solid=false}
+end
 
 --
 -- GENERATOR
