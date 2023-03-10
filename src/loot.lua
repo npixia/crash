@@ -6,6 +6,8 @@ local rngutils = requirep 'crash:rngutils'
 loot.LOOT_DATA = {
     {id='oxygen_pack',     count={1,1}, d={1,3}, weight=1},
     {id='grenade',         count={1,3}, d={1,3}, weight=1},
+    {id='fire_grenade',    count={1,3}, d={2,3}, weight=1},
+    {id='glowstick',       count={1,3}, d={2,3}, weight=1},
 }
 
 -- Weapons
