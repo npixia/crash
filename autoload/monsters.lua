@@ -1,5 +1,6 @@
 local Point = game.objects.Vector2d
 local pathfinding = requirep 'crash:pathfinding'
+local maputils = requirep 'crash:maputils'
 local clock = game.time.clock
 
 local function init(actor)
@@ -24,7 +25,7 @@ local function moveTowardPlayer(actor, map)
 
     if player_pos:dist(current_pos) < 10 then
         if clock() - actor:attr().last_move_time > 200 then
-            print("Can't get to player, running pathfinding")
+            --print("Can't get to player, running pathfinding")
             local _, next_pos = pathfinding.pathfind(current_pos, player_pos, {draw=true, maxiters=20})
             if next_pos then
                 actor:setXY(next_pos.x, next_pos.y)
@@ -36,8 +37,10 @@ end
 local function rangedAttack(actor, rate, projectile)
     local player_pos = player():pos()
     if clock() - actor:attr().last_fire_time > rate then
-        game.items.fire(projectile, actor:getX(), actor:getY(), player_pos.x, player_pos.y)
-        actor:attr().last_fire_time = clock()
+        if maputils.hasLOS(game.world.map(), actor:pos(), player_pos) then
+            game.items.fire(projectile, actor:getX(), actor:getY(), player_pos.x, player_pos.y)
+            actor:attr().last_fire_time = clock()
+        end
     end
 end
 
