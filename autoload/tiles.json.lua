@@ -190,5 +190,9 @@ chest.actor = {
     blocks=false,
 }
 
+-- BARRELS
+
+tile{'world_barrel', 'Barrel', layer='upper', solid=false}
+
 
 return {tiles=tiles, items=items}

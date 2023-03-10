@@ -166,7 +166,7 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
         end
 
         if can_place_prev_floor_stairs then
-            print('Found good layout on attempt #' .. layout_attempt_number)
+            --print('Found good layout on attempt #' .. layout_attempt_number)
             break
         end
     end
@@ -320,6 +320,28 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
         map:setUpper(generator_loc.x, generator_loc.y, T'world_generator_off')
         print('Placed generator @ ' .. to_str(generator_loc))
     end
+
+    -- Chem barrels
+    for _=1,rng:random(2, 2 + difficulty * 2) do
+        local room = rngutils.randchoice(rng, rooms)
+        if room.width > 7 and room.height > 7 then
+            local p = offset + room:rngPointInterior(rng)
+            print('Chacking ' ..  to_str(p) .. ' for barrel')
+            print(to_str(map:getUpper(p.x, p.y)))
+            if map:getUpper(p.x, p.y) == game.tiles.NIL then
+                map:spawn('explosive_barrel', p.x, p.y)
+                print('placed explosive barrel')
+                for _=1,rng:random(1,7) do
+                    local q = offset + room:rngPointInterior(rng)
+                    if map:getUpper(q.x, q.y) == game.tiles.NIL then
+                        map:setUpper(q.x, q.y, game.tiles.fromID('world_barrel'))
+                        print('placed barrel')
+                    end
+                end
+            end
+        end
+    end
+
 
     mob_spawning.spawnFloor(map, rooms, offset, difficulty, rng)
 end
