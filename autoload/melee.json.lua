@@ -32,14 +32,45 @@ local items = {}
 items['saber'] = {
     desc='A sword-like saber',
     visual={
-        sprite='crash/tg_items/tg_items_saber_blue'
+        sprite='crash/tg_items/tg_items_saber',
+        overlay_sprite='crash/tg_items/tg_items_saber_color',
+        glow=true,
+        light={name='white', ['*']=0.3},
     },
     traits={'melee'},
     attributes={
-        melee_damage=2,
+        melee_damage=5,
+        armor_pierce=2,
     }
 }
 
+items['knife'] = {
+    desc='A knife',
+    visual={
+        sprite='crash/tg_items/tg_items_knife',
+        overlay_sprite='crash/tg_items/tg_items_knife_color',
+        overlay_color='green',
+        glow=true,
+        light={name='white', ['*']=0.3},
+    },
+    traits={'melee'},
+    attributes={
+        melee_damage=3,
+        armor_pierce=2
+    }
+}
+
+items['pipe'] = {
+    desc='A knife',
+    visual={
+        sprite='crash/tg_items/tg_items_pipe',
+    },
+    traits={'melee'},
+    attributes={
+        melee_damage=3,
+        armor_pierce=0
+    }
+}
 
 
 return {

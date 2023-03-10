@@ -301,7 +301,8 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
                 keycard.attr.floor_name = '[[Floor ' .. next_floor .. ']]'
                 --print('Giving keycard with attr ' .. to_str(keycard.attr))
                 engineer:give(keycard)
-                loot.giveRandomArmor(rng, engineer, difficulty)
+                loot.giveOne(loot.ARMORS, rng, engineer, difficulty)
+                loot.giveOne(loot.WEAPONS, rng, engineer, difficulty)
             end
             map:setUpper(p.x, p.y, T'world_blood_red_c')
             num_engineers_to_place = num_engineers_to_place - 1
