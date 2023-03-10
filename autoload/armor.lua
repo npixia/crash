@@ -5,17 +5,17 @@ local strutils = requirep 'crash:strutils'
 game.items.defineTraitAction('wearable', 'equip', {},
     function(item, owner)
         local slot = item.attr.wearable
-        local space_avail = owner:spaceAvailableInSlot(slot)
-        if space_avail == 0 then
-            print('Slot ' .. slot .. ' full. Automatically removing item')
-            owner:unequipSlotOne(slot)
-        end
+
+        --local space_avail = owner:spaceAvailableInSlot(slot)
+        --if space_avail == 0 then
+        --    print('Slot ' .. slot .. ' full. Automatically removing item')
+        --    owner:unequipSlotOne(slot)
+        --end
+
+        owner:unequipSlotOne(slot)
 
         if not owner:equip(item) then
             print('Unable to equip item ' .. item.name)
-        else
-            -- remove this print
-            print('debug: item equipped! ' .. item.name)
         end
     end
 )
