@@ -4,6 +4,8 @@ game.worldgen.register(SpaceShip, 'crash', 'src/spaceship_world_generator.lua')
 
 local Point = game.objects.Vector2d
 local maputils = requirep 'crash:maputils'
+local rngutils = requirep 'crash:rngutils'
+local mob_spawning = requirep 'crash:mob_spawning'
 local loot = requirep 'crash:loot'
 
 local T = game.tiles.fromID
@@ -89,14 +91,10 @@ local function fromDir(dir)
     end
 end
 
-local function randchoice(rng, list)
-    return list[rng:random(1,#list)]
-end
-
-
 function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn_x, spawn_y, submap_name, params)
     if z == 0 then return end
-    print('Map z: ' .. z)
+    local difficulty = math.min(3, -1 * (z)) -- 1..3
+    print('map_z=' .. z .. ' difficulty=' .. difficulty)
     local last_floor = isLastFloor(z)
     if isLastFloor(z) then
         print('Final floor!')
@@ -197,7 +195,7 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
         repeat
             local p = offset + room:interior():rngPointAlongWall(rng)
             if map:getUpper(p.x, p.y) == game.tiles.NIL then
-                local dir_id = randchoice(rng, {'N', 'S', 'E', 'W'})
+                local dir_id = rngutils.randchoice(rng, {'N', 'S', 'E', 'W'})
                 local dir = fromDir(dir_id)
                 local wall_check_loc = p + dir
                 if map:getUpper(wall_check_loc.x, wall_check_loc.y).is_solid then
@@ -205,18 +203,13 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
                     table.insert(light_locations, {x=p.x, y=p.y})
                     light_placed = true
                 else
-                    print(to_str(map:getUpper(wall_check_loc.x, wall_check_loc.y)) .. ' is not solid')
+                    --print(to_str(map:getUpper(wall_check_loc.x, wall_check_loc.y)) .. ' is not solid')
                 end
             else
-                print('Point along wall is not nil')
+                --print('Point along wall is not nil')
             end
             attempts = attempts + 1
         until light_placed or attempts > 100
-        if not light_placed then
-            print('Failed to place light')
-        else
-            print('Placed light')
-        end
     end
     -- Store light locations
     map:attr().light_locations = light_locations
@@ -279,6 +272,7 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
         print('Placed generator @ ' .. to_str(generator_loc))
     end
 
+    mob_spawning.spawnFloor(map, rooms, offset, difficulty, rng)
 end
 
 -- Return list of rooms, list of doors, and down staircase location
