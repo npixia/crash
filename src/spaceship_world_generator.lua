@@ -229,17 +229,17 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
     map:setUpper(cdoor_x, offset.y+center_room.y2-1, game.tiles.NIL)
 
     -- Add terminal to rooms
-    local terminal  = T'world_terminal_b'
-    for _, room in ipairs(rooms) do
-        local p = room:interior():rngPointAlongWall(rng)
-        map:setUpper(offset.x+p.x, offset.y+p.y, terminal)
-    end
+    --local terminal  = T'world_terminal_b'
+    --for _, room in ipairs(rooms) do
+    --    local p = room:interior():rngPointAlongWall(rng)
+    --    map:setUpper(offset.x+p.x, offset.y+p.y, terminal)
+    --end
 
     -- Add lights to rooms
     local light_locations = {}
     local lights = {}
     for _, dir in ipairs({'N','S','E','W'}) do
-        lights[dir] = T('world_wall_light_blue_' .. dir .. '_bright')
+        lights[dir] = T('world_wall_light_blue_' .. dir) -- .. '_bright')
     end
     for _, room in ipairs(rooms) do
         local light_placed = false
@@ -268,11 +268,13 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
 
     -- Chests
     for _, room in ipairs(rooms) do
-        local p = offset + room:interior():rngPointAlongWall(rng)
-        if map:getUpper(p.x, p.y) == game.tiles.NIL then
-            local chest_id = map:spawn('chest', p.x, p.y)
-            local chest = map:actors():getActor(chest_id)
-            loot.fillChest(rng, chest, difficulty)
+        if rng:random() < 0.5 then
+            local p = offset + room:interior():rngPointAlongWall(rng)
+            if map:getUpper(p.x, p.y) == game.tiles.NIL then
+                local chest_id = map:spawn('chest', p.x, p.y)
+                local chest = map:actors():getActor(chest_id)
+                loot.fillChest(rng, chest, difficulty)
+            end
         end
     end
 

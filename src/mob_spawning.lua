@@ -6,7 +6,7 @@ local function spawn(map, rooms, offset, rng, id, attempts)
     local count = 0
     for _ = 1,attempts do
         local room = rngutils.randchoice(rng, rooms)
-        local p = offset + room:interior():rngPointInterior(rng)
+        local p = offset + room:interior():interior():rngPointInterior(rng)
         if map:getUpper(p.x, p.y) == game.tiles.NIL then
             map:spawn(id, p.x, p.y)
             count = count + 1

@@ -25,6 +25,9 @@ function pathfinding.pathfind(from, to, options)
     if options == nil then options = {} end
     local maxiters = options.maxiters or 1000
 
+    -- manual override
+    options.draw = false
+
     local canvas = game.render.getCanvas('pathfind_debug')
     canvas:setDrawType('overlay')
     canvas:clear()
