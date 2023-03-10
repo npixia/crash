@@ -123,9 +123,9 @@ local function makeArmorSet(items, id_base, name, defense, color)
     }
 end
 
-makeArmorSet(items, 'space_suit', 'Basic', 1, 'grey')
-makeArmorSet(items, 'enhanced', 'Enhanced', 2, 'red')
-makeArmorSet(items, 'armored', 'Armored', 3, 'blue')
+makeArmorSet(items, 'light', 'Basic', 0, 'grey')
+makeArmorSet(items, 'medium', 'Protective', 2, 'red')
+makeArmorSet(items, 'heavy', 'Armored', 3, 'blue')
 
 return {
     traits=traits,

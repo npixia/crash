@@ -56,11 +56,11 @@ actors['crawler'] = {
         max_hp=3,
         defense=0,
         xp=1,
-        attack_amount=2,
     },
     ai={
         type='monster',
-        energy_per_turn=120
+        energy_per_turn=120,
+        attack_amount=2,
     }
 }
 

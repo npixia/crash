@@ -1,15 +1,24 @@
 local loot = {}
 
+local rngutils = requirep 'crash:rngutils'
+
 local LOOT_DATA = {
-    {id='oxygen_pack', count={1,1}, floors={1,10}, weight=1},
-    {id='grenade',     count={1,3}, floors={1,10}, weight=1},
-    {id='saber',       count={1,1}, floors={1,10}, weight=1},
+    {id='oxygen_pack',     count={1,1}, d={1,3}, weight=1},
+    {id='grenade',         count={1,3}, d={1,3}, weight=1},
+    {id='saber',           count={1,1}, d={1,3}, weight=1},
 }
 
-
-local function filterItems(items, floor)
-    return items
+-- Armors
+local ARMORS = {}
+for weight_id, req_difficulty in pairs({light=1,medium=2,heavy=3}) do
+    for _,type_id in ipairs({'jacket','pants','helmet','boots'}) do
+        table.insert(ARMORS, {
+            id = weight_id .. '_' .. type_id,
+            d = req_difficulty
+        })
+    end
 end
+
 
 local function getLootItem(rng, items)
     local weighted_sum_data = {}
@@ -35,8 +44,18 @@ local function randomize(item, rng)
     end
 end
 
-function loot.fillChest(rng, chest, floor)
-    local item_table = filterItems(LOOT_DATA, floor)
+function loot.giveRandomArmor(rng, actor, difficulty)
+    local armors = list.filter(ARMORS, function(a) return a.d <= difficulty end)
+    local item = game.items.makeItem(rngutils.randchoice(rng, armors).id)
+    randomize(item, rng)
+    actor:give(item)
+end
+
+function loot.fillChest(rng, chest, difficulty)
+    local item_table = list.filter(LOOT_DATA, function (item)
+        return item.d[1] <= difficulty and item.d[2] >= difficulty
+    end)
+
     local added_items = {}
 
     for _ = 1,5 do
@@ -48,6 +67,10 @@ function loot.fillChest(rng, chest, floor)
             chest:give(item, rng:random(item_data.count[1], item_data.count[2]))
             table.insert(added_items, item_data.id)
         end
+    end
+
+    if rng:random() < 0.4 then
+        loot.giveRandomArmor(rng, chest, difficulty)
     end
 end
 

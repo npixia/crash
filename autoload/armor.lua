@@ -1,5 +1,7 @@
+local tg = game.textgen
+local choice = tg.choice
+local strutils = requirep 'crash:strutils'
 
---[[ TODO: remove when all items have an option to equip ]]--
 game.items.defineTraitAction('wearable', 'equip', {},
     function(item, owner)
         local slot = item.attr.wearable
@@ -39,3 +41,36 @@ game.items.validateTrait('wearable',
         end
     end
 )
+
+--
+-- Armor Randomization
+--
+
+local weight_info = {
+    light = {defense={1,1}, name=choice('light', 'thin'), desc='It offers a small amount of protection.'},
+    med   = {defense={2,2}, name=choice('medium', 'padded'), desc='It offers a moderate amount of protection.'},
+    heavy = {defense={3,3}, name=choice('heavy', 'thick'), desc='It is very protective.'},
+}
+
+local material = choice('mesh','kevlar','plastisteel','carbon fiber','fabric','steel','titanium')
+
+local type_names = {
+    jacket = choice('jacket', 'vest', 'chest peice'),
+    pants = choice('pants','leggings'),
+    helmet = choice('helmet'),
+    boots = choice('boots'),
+}
+
+for weight_id, weight_data in pairs(weight_info) do
+    for type_id, type_name_gen in pairs(type_names) do
+        game.items.defineEvent(weight_id .. '_' .. type_id, 'onGenerateRandom', function(item, rng)
+            local name = tg.generate(choice(weight_data.name .. ' ' .. material .. ' ' .. type_name_gen))
+            item.attr.name = strutils.title(name)
+            item.attr.desc = 'A ' .. name .. '. ' .. weight_data.desc
+            if type_id == 'helmet' then
+                item.attr.desc = item.attr.desc .. ' It has a headlamp attached which provides some light.'
+            end
+            item.attr.defense = rng:random(weight_data.defense[1], weight_data.defense[2])
+        end)
+    end
+end
