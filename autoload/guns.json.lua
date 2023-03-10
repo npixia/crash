@@ -107,4 +107,40 @@ items['energy_projectile'] = {
     },
 }
 
+items['monster_projectile'] = {
+    desc='dev',
+    visual={
+        sprite='crash/tg_fx/tg_fx_voidball',
+        glow=true,
+        light={
+            format='float',
+            r=0.8,
+            g=0.6,
+            b=0.8,
+        }
+    },
+    attributes={
+        ammo_base_damage=2,
+    }
+}
+
+items['big_monster_projectile'] = {
+    desc='dev',
+    visual={
+        sprite='crash/tg_fx/tg_fx_voidimpact_1',
+        glow=true,
+        light={
+            format='float',
+            r=0.8,
+            g=0.6,
+            b=0.8,
+        }
+    },
+    attributes={
+        ammo_base_damage=4,
+    }
+}
+
+
+
 return {traits=traits, items=items}

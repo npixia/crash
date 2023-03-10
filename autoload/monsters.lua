@@ -79,10 +79,10 @@ game.actors.addCallback('big_crawler', 'update', function(actor, map) moveToward
 
 game.actors.addCallback('soldier', 'update', function(actor, map)
     moveTowardPlayer(actor, map)
-    rangedAttack(actor, 500, game.items.makeItem('energy_projectile'))
+    rangedAttack(actor, 500, game.items.makeItem('monster_projectile'))
 end)
 
 game.actors.addCallback('leader', 'update', function(actor, map)
     moveTowardPlayer(actor, map)
-    rangedAttack(actor, 500, game.items.makeItem('energy_projectile'))
+    rangedAttack(actor, 500, game.items.makeItem('big_monster_projectile'))
 end)
