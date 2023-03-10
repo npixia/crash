@@ -206,12 +206,17 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
     end
     --print('Got ' .. #doors .. ' doors')
     local t_door = T'world_door_hatch_h_closed'
+    local t_door_open = T'world_door_hatch_h_open'
     for _, door in ipairs(doors) do
         local d = door + offset
         if rng:random() < 0.5 then
             d.x = d.x-1
         end
-        map:set(d.x, d.y, t_door)
+        local door_tile = t_door
+        if rng:random() < 0.3 then
+            door_tile = t_door_open
+        end
+        map:set(d.x, d.y, door_tile)
         map:setUpper(d.x-1, d.y, game.tiles.NIL)
         map:setUpper(d.x+1, d.y, game.tiles.NIL)
     end
