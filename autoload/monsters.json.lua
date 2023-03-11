@@ -69,7 +69,7 @@ actors['big_crawler'] = {
     visual={ sprite=monsterSprite('crawler_queen_u1') },
     destructible={
         type='monster',
-        max_hp=6,
+        max_hp=10,
         defense=1,
         xp=1
     },

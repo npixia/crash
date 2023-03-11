@@ -99,18 +99,9 @@ door('world_door_hatch_h_closed', 'world_door_hatch_h_open', 'Door')
 --
 
 local terminals = {
-    a=tile{'world_terminal_a', 'Terminal (Activated)', layer='upper', solid=false},
-    b=tile{'world_terminal_b', 'Terminal', layer='upper', solid=false},
-    c=tile{'world_terminal_c', 'Terminal (No Power)', layer='upper', solid=false},
-}
-for _,terminal in pairs(terminals) do
-    terminal.pixel_color = '#00ff00'
-end
-terminals['b'].light = {
-    format='float',
-    r=0.0,
-    g=0.2,
-    b=0.0,
+    --b=tile{'world_terminal_a', 'Terminal', layer='upper', solid=false},
+    b=tile{'world_terminal_b', 'Navigation Console', layer='upper', solid=false},
+    c=tile{'world_terminal_c', 'Navigation Console', layer='upper', solid=false},
 }
 
 --
@@ -128,9 +119,9 @@ local function stairs(id)
     down_stair_locked.sprite = f'crash/tg_world/tg_' .. id .. '_down'
 
     -- For debugging
-    up_stair.light = {name='blue', ['*']=0.5}
-    down_stair.light = {name='blue', ['*']=0.5}
-    down_stair_locked.light = {name='blue', ['*']=0.5}
+    --up_stair.light = {name='blue', ['*']=0.5}
+    --down_stair.light = {name='blue', ['*']=0.5}
+    --down_stair_locked.light = {name='blue', ['*']=0.5}
 end
 
 stairs('world_wall_rust_stair')
@@ -149,8 +140,8 @@ end
 -- GENERATOR
 --
 
-local generator_on =  tile{'world_generator_on', 'Generator Control', layer='upper', solid=false, unbreakable=true}
-local generator_off = tile{'world_generator_off', 'Generator Control', layer='upper', solid=false, unbreakable=true}
+local generator_on =  tile{'world_switch_on', 'Backup Power Control', layer='upper', solid=false, unbreakable=true}
+local generator_off = tile{'world_switch_off', 'Backup Power Control', layer='upper', solid=false, unbreakable=true}
 
 generator_off.light = {format='float', r=0.3}
 generator_on.light  = {format='float', g=0.5}
@@ -191,6 +182,8 @@ chest.actor = {
 }
 
 -- BARRELS
+
+tile{'world_barrel', 'Barrel', layer='upper', solid=false}
 
 tile{'world_barrel', 'Barrel', layer='upper', solid=false}
 

@@ -22,6 +22,7 @@ Move using [color=green]WASD[/color]
 [color=green]G[/color]: Pick Up (Some items are auto-pickup)
 [color=green]P[/color]: Equipment
 [color=green]/[/color]: Open message log ([color=green]ESC[/color]) to close
+[color=green].[/color]: Wait 1 turn
 
 [color=orange]Menus/Other[/color]:
 [color=green]ESC[/color] or [color=green]Q[/color] to exit menus, dialogs, and screens
@@ -67,8 +68,8 @@ game.signal.subscribe('/world/load/render_complete', function()
 
     if game.world.data().player_dead then
         game.gui.messageBox(died_message)
+        print(died_message)
     end
-    print(died_message)
 end)
 
 
@@ -83,7 +84,7 @@ game.signal.subscribe('/player/death', function()
     game.save()
 
     game.gui.messageBox('You Died!', 'You Died!')
-    local selected = game.gui.menuSelect('Respawn?', {'close', 'exit'})
+    local selected = game.gui.menuSelect('You Died!', {'close', 'exit'})
     if selected == 0 or selected == 1 then
         -- player selected close
     elseif selected == 2 then

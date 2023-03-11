@@ -2,6 +2,17 @@ local tg = game.textgen
 local choice = tg.choice
 local strutils = requirep 'crash:strutils'
 
+game.items.defineTraitAction('melee', 'attack', {fn_type='MAP', default=true},
+    function(item, owner, map, x, y)
+        local has_target = game.battle.meleeAtLoc(owner, item, map, x, y)
+        if has_target then
+            return {time=100}
+        else
+            return {time=0}
+        end
+    end
+)
+
 game.items.defineEvent('pipe', 'onGenerateRandom', function(item, rng)
     local name, damage
     if rng:random() < 0.5 then
@@ -25,6 +36,17 @@ game.items.defineEvent('knife', 'onGenerateRandom', function(item, rng)
     item.attr.armor_pierce = rng:random(1, 2)
     item.attr._color_overlay = Color.fromHSV(rng:random(0,359), 100, 70):rgba()
 end)
+
+game.items.defineEvent('knife', 'onThrownImpact', 
+    function(item, map, x, y)
+        local dmg = item.attr.melee_damage or 1
+        local actors = map:actors():getActorsAt(x, y)
+        for i = 1,#actors do
+            actors[i]:damage(dmg)
+        end
+        return true
+    end
+)
 
 game.items.defineEvent('saber', 'onGenerateRandom', function(item, rng)
     local name = tg.generate(choice('laser', 'plasma') .. ' ' .. choice('sword', 'saber'))

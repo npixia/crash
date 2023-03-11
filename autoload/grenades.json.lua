@@ -6,7 +6,8 @@ return {
             default_action='throw',
         },
         fire_grenade={
-            desc='Fire grenade that explodes on impact',
+            name='Incendiary Grenade',
+            desc='Incendiary grenade that explodes into a fireball on impact',
             sprite='crash/tg_items/tg_items_grenade',
             color='orange',
             default_action='throw',

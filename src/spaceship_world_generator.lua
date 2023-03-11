@@ -126,10 +126,10 @@ end
 function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn_x, spawn_y, submap_name, params)
     if z == 0 then return end
     local difficulty = math.min(3, -1 * (z)) -- 1..3
-    print('map_z=' .. z .. ' difficulty=' .. difficulty)
+    --print('map_z=' .. z .. ' difficulty=' .. difficulty)
     local last_floor = isLastFloor(z)
     if isLastFloor(z) then
-        print('Final floor!')
+        --print('Final floor!')
     end
 
     local rng = game.random.generator(math.random(1,10000))
@@ -228,6 +228,10 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
     map:set(cdoor_x, offset.y+center_room.y2-2, t_door)
     map:setUpper(cdoor_x, offset.y+center_room.y2-1, game.tiles.NIL)
 
+    if z == -1 then
+        map:setUpper(cx-1, cy, T'world_terminal_c')  
+    end
+
     -- Add terminal to rooms
     --local terminal  = T'world_terminal_b'
     --for _, room in ipairs(rooms) do
@@ -266,17 +270,7 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
     -- Store light locations
     map:attr().light_locations = light_locations
 
-    -- Chests
-    for _, room in ipairs(rooms) do
-        if rng:random() < 0.5 then
-            local p = offset + room:interior():rngPointAlongWall(rng)
-            if map:getUpper(p.x, p.y) == game.tiles.NIL then
-                local chest_id = map:spawn('chest', p.x, p.y)
-                local chest = map:actors():getActor(chest_id)
-                loot.fillChest(rng, chest, difficulty)
-            end
-        end
-    end
+   
 
     -- Add staircase
     if not last_floor then
@@ -295,7 +289,7 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
 
 
     -- Place engineers
-    local num_engineers_to_place = rng:random(2,3)
+    local num_engineers_to_place = 2
     while num_engineers_to_place > 0 do
         local room = rooms[rng:random(1, #rooms)]
         local p = offset + room:rngPointInterior(rng, 1)
@@ -312,7 +306,19 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
             end
             map:setUpper(p.x, p.y, T'world_blood_red_c')
             num_engineers_to_place = num_engineers_to_place - 1
-            print('Placed engineer @ ' .. to_str(p))
+            --print('Placed engineer @ ' .. to_str(p))
+        end
+    end
+
+    -- Chests
+    for _, room in ipairs(rooms) do
+        if rng:random() < 0.4 then
+            local p = offset + room:interior():rngPointAlongWall(rng)
+            if map:getUpper(p.x, p.y) == game.tiles.NIL then
+                local chest_id = map:spawn('chest', p.x, p.y)
+                local chest = map:actors():getActor(chest_id)
+                loot.fillChest(rng, chest, difficulty)
+            end
         end
     end
 
@@ -323,8 +329,8 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
             generator_loc = offset + center_room:interior():rngPointInterior(rng)
         until map:getUpper(generator_loc.x, generator_loc.y) == game.tiles.NIL
 
-        map:setUpper(generator_loc.x, generator_loc.y, T'world_generator_off')
-        print('Placed generator @ ' .. to_str(generator_loc))
+        map:setUpper(generator_loc.x, generator_loc.y, T'world_switch_off')
+        --print('Placed generator @ ' .. to_str(generator_loc))
         print('You hear the [color=yellow]backup power control[/color] alarm nearby...')
     end
 
@@ -333,16 +339,16 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
         local room = rngutils.randchoice(rng, rooms)
         if room.width > 7 and room.height > 7 then
             local p = offset + room:rngPointInterior(rng)
-            print('Chacking ' ..  to_str(p) .. ' for barrel')
-            print(to_str(map:getUpper(p.x, p.y)))
+            --print('Checking ' ..  to_str(p) .. ' for barrel')
+            --print(to_str(map:getUpper(p.x, p.y)))
             if map:getUpper(p.x, p.y) == game.tiles.NIL then
                 map:spawn('explosive_barrel', p.x, p.y)
-                print('placed explosive barrel')
+                --print('placed explosive barrel')
                 for _=1,rng:random(1,7) do
                     local q = offset + room:rngPointInterior(rng)
                     if map:getUpper(q.x, q.y) == game.tiles.NIL then
                         map:setUpper(q.x, q.y, game.tiles.fromID('world_barrel'))
-                        print('placed barrel')
+                        --print('placed barrel')
                     end
                 end
             end

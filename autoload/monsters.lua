@@ -36,7 +36,9 @@ local function moveTowardPlayer(actor, map)
         if actor:attr().last_move_time > 200 then
             if math.random() < 0.2 then
                 local next_pos = Point(math.random(-1, 1), math.random(-1, 1)) + current_pos
-                actor:setXY(next_pos.x, next_pos.y)
+                if map:getUpper(next_pos.x, next_pos.y) == game.tiles.NIL then
+                    actor:setXY(next_pos.x, next_pos.y)
+                end
             end
         end
     end

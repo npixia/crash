@@ -17,17 +17,17 @@ game.items.defineTraitAction('ranged', 'fire', {fn_type='MAP', default=true},
 
                 -- If we are a few tiles away, roll for accuracy
                 if Point(x, y):dist(owner:pos()) > item.attr.range then
-                    print('far, testing for accuracy..')
+                    --print('far, testing for accuracy..')
                     if math.random() > item.attr.accuracy then
                         -- miss
-                        print('miss')
+                        --print('miss')
                         x = x + math.random(-1, 1)
                         y = y + math.random(-1, 1)
                     else
-                        print('perfect shot')
+                        --print('perfect shot')
                     end
                 else
-                    print('close, not rolling for accuracy')
+                    --print('close, not rolling for accuracy')
                 end
 
                 game.items.fire(projectile, owner:getX(), owner:getY(), x, y)
