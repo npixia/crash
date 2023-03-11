@@ -4,10 +4,12 @@ local makeItem = game.items.makeItem
 local rngutils = requirep 'crash:rngutils'
 
 loot.LOOT_DATA = {
-    {id='oxygen_pack',     count={1,1}, d={1,3}, weight=1},
-    {id='grenade',         count={1,3}, d={1,3}, weight=1},
-    {id='fire_grenade',    count={1,3}, d={2,3}, weight=1},
-    {id='glowstick',       count={1,3}, d={2,3}, weight=1},
+    {id='oxygen_pack',     count={1,1},  d={1,3}, weight=5},
+    {id='grenade',         count={1,2},  d={1,3}, weight=3},
+    {id='fire_grenade',    count={1,3},  d={2,3}, weight=3},
+    {id='glowstick',       count={1,3},  d={2,3}, weight=10},
+    {id='medkit',          count={1,3},  d={1,3}, weight=1},
+    {id='energy_ammo',     count={5,10}, d={1,3}, weight=1},
 }
 
 -- Weapons
@@ -83,7 +85,7 @@ function loot.fillChest(rng, chest, difficulty)
 
     local added_items = {}
 
-    for _ = 1,5 do
+    for _ = 1,rng:random(1,2) do
         local item_data = getLootItem(rng, filtered_pool)
         -- Prevent duplicate items
         if not list.contains(added_items, item_data.id) then
@@ -95,12 +97,12 @@ function loot.fillChest(rng, chest, difficulty)
     end
 
     -- Weapons and armor
-    if true then -- rng:random() < 0.4 then
+    if rng:random() < 0.4 then
         local _, item = loot.selectOne(loot.ARMORS, rng, difficulty)
         chest:give(item)
     end
 
-    if  true then -- rng:random() < 0.4 then
+    if rng:random() < 0.4 then
         local _, item = loot.selectOne(loot.WEAPONS, rng, difficulty)
         chest:give(item)
         if item.attr.ranged_ammo_type then

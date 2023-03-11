@@ -1,4 +1,4 @@
-local saturation = 0.1
+local saturation = 0.3
 game.items.defineAction('oxygen_pack', 'use', {},
     function(item, owner)
         game.effect.hunger(item, owner, 1, item.attr.oxygen_amount, saturation)

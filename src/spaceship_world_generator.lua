@@ -287,6 +287,8 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
     if prev_floor_stair_loc then
         local p = prev_floor_stair_loc
         map:setUpper(offset.x+p.x, offset.y+p.y, T'world_wall_rust_stair_up')
+        local up = offset + p
+        game.world.data()['floor_' .. (-1*z) .. '_up_stair_offset'] = {x=up.x, y=up.y}
     end
 
     game.world.data()['floor_' .. (-1*z) .. '_down_stair'] = {x=stair_loc.x, y=stair_loc.y}
@@ -323,6 +325,7 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
 
         map:setUpper(generator_loc.x, generator_loc.y, T'world_generator_off')
         print('Placed generator @ ' .. to_str(generator_loc))
+        print('You hear the [color=yellow]backup power control[/color] alarm nearby...')
     end
 
     -- Chem barrels

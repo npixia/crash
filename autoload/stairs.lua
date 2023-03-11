@@ -1,4 +1,6 @@
 local ship_power = requirep 'crash:ship_power'
+local Point = game.objects.Vector2d
+
 
 local function addStairInteraction(id)
 
@@ -8,10 +10,22 @@ local function addStairInteraction(id)
             if map_z >= 0 then
                 print("Can't go up!")
             else
-                game.world.teleport(x, y, map_x, map_y, map_z+1, region)
+                map_z = map_z + 1
+                game.world.teleport(x, y, map_x, map_y, map_z, region)
+                local map = game.world.map()
                 print('Checking ship power status...')
                 if ship_power.isPowerOn() then
                     print('power status is on, turning on the lights..')
+                    if not game.world.map():attr().power_activated then
+                        local stair_loc = game.world.data()['floor_' .. (-1*map_z) .. '_up_stair_offset']
+                        map:spawn('leader', stair_loc.x, stair_loc.y)
+                        print('spawned leader @ ' .. to_str(stair_loc))
+                        local second_loc = Point(x,y) + Point(math.random(-1,1), math.random(-1, 1))
+                        if map:getUpper(second_loc.x, second_loc.y) == game.tiles.NIL then
+                            map:spawn('leader', second_loc.x, second_loc.y)
+                            print('spawned second leader @ ' .. to_str(second_loc))
+                        end
+                    end
                     ship_power.activateFloor(game.world.map())
                 end
             end

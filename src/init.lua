@@ -50,6 +50,8 @@ game.signal.subscribe('/world/load/complete', function()
 
 end)
 
+local died_message  = 'You [color=red]Died[/color]! Close the game and create a new world to try again.'
+
 -- Called after the first render tick has completed after the world has loaded
 game.signal.subscribe('/world/load/render_complete', function()
 
@@ -64,10 +66,9 @@ game.signal.subscribe('/world/load/render_complete', function()
     end
 
     if game.world.data().player_dead then
-        game.gui.messageBox('You Died!')
-        wait(100)
-        game.exit()
+        game.gui.messageBox(died_message)
     end
+    print(died_message)
 end)
 
 
@@ -81,18 +82,12 @@ game.signal.subscribe('/player/death', function()
     game.world.data().player_dead = true
     game.save()
 
-    local loop = true
-    while loop do
-        game.gui.messageBox('You Died!', 'You Died!')
-        local selected = game.gui.menuSelect('Respawn?', {'close', 'respawn', 'exit'})
-        loop = false
-        if selected == 0 or selected == 1 then
-            -- player selected close
-            loop = true
-        elseif selected == 2 then
-            heal()
-        elseif selected == 3 then
-            game.exit()
-        end
+    game.gui.messageBox('You Died!', 'You Died!')
+    local selected = game.gui.menuSelect('Respawn?', {'close', 'exit'})
+    if selected == 0 or selected == 1 then
+        -- player selected close
+    elseif selected == 2 then
+        game.exit()
     end
+    print(died_message)
 end)
