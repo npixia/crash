@@ -85,8 +85,8 @@ end
 function Room:rngPointInterior(rng, margin)
     margin = margin or 0
     return Point(
-        self.x1 + margin + rng:random(1, self.width-(2*(1+margin))),
-        self.y1 + margin + rng:random(1, self.height-(2*(1+margin)))
+        self.x1 + margin + rng:random(1, math.max(1, self.width-(2*(1+margin)))),
+        self.y1 + margin + rng:random(1, math.max(1, self.height-(2*(1+margin))))
     )
 end
 function Room:isInside(p)
@@ -280,7 +280,7 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
 
     -- Add staircase
     if not last_floor then
-        map:setLower(offset.x+stair_loc.x, offset.y+stair_loc.y, T'world_wall_rust_stair_down_locked')
+        map:setLower(offset.x+stair_loc.x, offset.y+stair_loc.y, T'world_wall_rust_stair_down')
         map:setUpper(offset.x+stair_loc.x, offset.y+stair_loc.y, game.tiles.NIL)
     end
 
@@ -302,11 +302,8 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
             local engineer = map:actors():getActor(engineer_id)
             -- If we are not on the last floor, give them the key card to the next floor
             if not last_floor then
-                local keycard = game.items.makeItem('keycard')
                 local next_floor = -1*z + 1
-                keycard.attr.floor = next_floor
-                keycard.attr.floor_name = '[[Floor ' .. next_floor .. ']]'
-                --print('Giving keycard with attr ' .. to_str(keycard.attr))
+                local keycard = game.items.makeItem('keycard_' .. next_floor)
                 engineer:give(keycard)
                 loot.giveOne(loot.ARMORS, rng, engineer, difficulty)
                 loot.giveOne(loot.WEAPONS, rng, engineer, difficulty)

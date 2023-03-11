@@ -21,18 +21,20 @@ local function addStairInteraction(id)
     end)
 
     game.tiles.addInteraction(id .. '_down', 'descend', function(actor, x, y)
-        if actor:getX() == x and actor:getY() == y then
-            local map_x, map_y, map_z, region = game.world.currentMapLocation()
-            game.world.teleport(x, y, map_x, map_y, map_z-1, region)
-            return true
+        local map_x, map_y, map_z, region = game.world.currentMapLocation()
+        local next_floor = -1 * map_z + 1
+        if actor:count(game.items.makeItem('keycard_' .. next_floor)) > 0 then
+            if actor:getX() == x and actor:getY() == y then
+                game.world.teleport(x, y, map_x, map_y, map_z-1, region)
+                return true
+            else
+                print('Must be standing on stairs');
+                return false
+            end
         else
-            print('Must be standing on stairs');
-            return false
+            print("[color=red]ACCESS DENIED[/color] Please insert keycard for this floor")
         end
-    end)
 
-    game.tiles.addInteraction(id .. '_down_locked', 'descend', function(actor, x, y)
-        print("[color=red]ACCESS DENIED[/color] Please insert keycard for this floor")
     end)
 end
 
