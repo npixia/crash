@@ -4,12 +4,12 @@ local makeItem = game.items.makeItem
 local rngutils = requirep 'crash:rngutils'
 
 loot.LOOT_DATA = {
+    {id='glowstick',       count={2,4},  d={1,3}, weight=30},
     {id='oxygen_pack',     count={1,1},  d={1,3}, weight=5},
-    {id='grenade',         count={1,2},  d={2,3}, weight=3},
-    {id='fire_grenade',    count={1,3},  d={1,3}, weight=7},
-    {id='glowstick',       count={2,4},  d={2,3}, weight=30},
-    {id='medkit',          count={1,1},  d={1,3}, weight=3},
+    {id='fire_grenade',    count={1,3},  d={1,3}, weight=5},
     {id='energy_ammo',     count={7,12}, d={1,3}, weight=5},
+    {id='grenade',         count={1,2},  d={2,3}, weight=3},
+    {id='medkit',          count={1,1},  d={1,3}, weight=3},
 }
 
 -- Weapons
@@ -59,7 +59,7 @@ local function filterDifficulty(pool, difficulty)
     end)
 end
 
-local function randomize(item, rng)
+function loot.randomize(item, rng)
     local onGenerateRandom = game.items.getEventFn(item, 'onGenerateRandom')
     if onGenerateRandom then
         onGenerateRandom(item, rng)
@@ -70,7 +70,7 @@ function loot.selectOne(pool, rng, difficulty)
     local filtered_pool = filterDifficulty(pool, difficulty)
     local selected = rngutils.randchoice(rng, filtered_pool)
     local item = makeItem(selected.id)
-    randomize(item, rng)
+    loot.randomize(item, rng)
     return selected, item
 end
 
@@ -90,7 +90,7 @@ function loot.fillChest(rng, chest, difficulty)
         -- Prevent duplicate items
         if not list.contains(added_items, item_data.id) then
             local item = makeItem(item_data.id)
-            randomize(item, rng)
+            loot.randomize(item, rng)
             chest:give(item, rng:random(item_data.count[1], item_data.count[2]))
             table.insert(added_items, item_data.id)
         end
@@ -105,9 +105,7 @@ function loot.fillChest(rng, chest, difficulty)
     if rng:random() < 0.4 then
         local _, item = loot.selectOne(loot.WEAPONS, rng, difficulty)
         chest:give(item)
-        if item.attr.ranged_ammo_type then
-            chest:give(makeItem(item.attr.ranged_ammo_type), rng:random(3,6))
-        end
+        chest:give(makeItem('energy_ammo'), rng:random(3,10))
     end
 end
 

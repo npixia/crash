@@ -132,7 +132,9 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
         --print('Final floor!')
     end
 
-    local rng = game.random.generator(math.random(1,10000))
+    print('universe seed=' .. universe_seed)
+
+    local rng = game.random.generator(universe_seed + z)
 
     local cx, cy = width/2, height/2
 
@@ -303,6 +305,9 @@ function SpaceShip:generateMap(universe_seed, map, width, height, x, y, z, spawn
                 engineer:give(keycard)
                 loot.giveOne(loot.ARMORS, rng, engineer, difficulty)
                 loot.giveOne(loot.WEAPONS, rng, engineer, difficulty)
+                local o2 = game.items.makeItem('oxygen_pack')
+                loot.randomize(o2, rng)
+                engineer:give(o2)
             end
             map:setUpper(p.x, p.y, T'world_blood_red_c')
             num_engineers_to_place = num_engineers_to_place - 1
